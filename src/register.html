@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Delivery Register</title>
+
+		<!-- bootstrap -->
+		<link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css" />
+
+		<!-- custom -->
+		<link rel="stylesheet" href="css/style.css" />
+	</head>
+
+	<body>
+		<!-- navbar section -->
+		<nav class="navbar navbar-expand-lg bg-white">
+			<div class="container py-2">
+				<a class="navbar-brand" href="#">Delivery<span>Eats</span></a>
+				<button
+					class="navbar-toggler"
+					type="button"
+					data-bs-toggle="collapse"
+					data-bs-target="#navbarSupportedContent"
+					aria-controls="navbarSupportedContent"
+					aria-expanded="false"
+					aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarSupportedContent">
+					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+						<li class="nav-item"><a class="nav-link" href="menu.html">Menu</a></li>
+						<li class="nav-item"><a class="nav-link" href="order.html">Orders</a></li>
+						<li class="nav-item"><a class="nav-link" href="cart.html">Cart</a></li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+
+		<!-- form section -->
+		<section id="login">
+			<div class="container py-5">
+				<div class="bg-deats rounded-3 p-5 col-12 col-lg-6 mx-auto shadow-sm">
+					<h4>Register New Account</h4>
+
+					<!-- register form -->
+					<form class="mt-4" id="registerForm">
+						<div class="mb-4">
+							<label for="name" class="form-label">Name</label>
+							<input type="text" class="form-control" id="name" placeholder="Enter your name" required />
+						</div>
+
+						<div class="mb-4">
+							<label for="gender" class="form-label">Gender</label>
+							<select class="form-select" id="gender" required>
+								<option value="male">Male</option>
+								<option value="female">Female</option>
+							</select>
+						</div>
+
+						<div class="mb-4">
+							<label for="phone" class="form-label">Phone Number</label>
+							<input
+								type="text"
+								class="form-control"
+								id="phone"
+								placeholder="Enter your phone number"
+								required />
+						</div>
+
+						<div class="mb-4">
+							<label for="dob" class="form-label">Date of Birth</label>
+							<input type="date" class="form-control" id="dob" required />
+						</div>
+
+						<div class="mb-4">
+							<label for="address" class="form-label">Address</label>
+							<input
+								type="text"
+								class="form-control"
+								id="address"
+								placeholder="Enter your address"
+								required />
+						</div>
+
+						<div class="mb-4">
+							<label for="email" class="form-label">Email address</label>
+							<input
+								type="email"
+								class="form-control"
+								id="email"
+								placeholder="Enter your email"
+								required />
+							<p class="mt-2 ms-1" id="emailHelp">Email will be used to login</p>
+						</div>
+
+						<div class="mb-4">
+							<label for="password" class="form-label">Password</label>
+							<input
+								type="password"
+								class="form-control"
+								id="password"
+								placeholder="Enter your password"
+								required />
+						</div>
+
+						<div class="d-flex justify-content-between align-items-center">
+							<button type="submit" class="btn btn-deats btn-md">
+								<span
+									class="spinner-border spinner-border-sm me-2 d-none"
+									role="status"
+									aria-hidden="true"
+									id="registerSpinner">
+								</span>
+								Register
+							</button>
+							<a href="login.html" class="text-decoration-none text-deats">Already have an account?</a>
+						</div>
+					</form>
+				</div>
+			</div>
+		</section>
+
+		<!-- toast -->
+		<div class="toast-container position-fixed bottom-0 end-0 p-3">
+			<div
+				id="liveToast"
+				class="toast align-items-center text-bg-deats border-0"
+				role="alert"
+				aria-live="assertive"
+				aria-atomic="true">
+				<div class="d-flex">
+					<div class="toast-body"></div>
+					<button
+						type="button"
+						class="btn-close btn-close-deats me-2 m-auto"
+						data-bs-dismiss="toast"
+						aria-label="Close"></button>
+				</div>
+			</div>
+		</div>
+
+		<!-- bootstrap -->
+		<script type="text/javascript" src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+		<!-- simple input mask -->
+		<script src="https://unpkg.com/imask"></script>
+
+		<!-- custom javascript -->
+		<script>
+			const bootstrap = window.bootstrap;
+
+			const toast = document.getElementById('liveToast');
+			const instance = bootstrap.Toast.getOrCreateInstance(toast);
+
+			const registerForm = document.getElementById('registerForm');
+			const registerButton = registerForm.querySelector('button');
+			const registerSpinner = registerButton.querySelector('#registerSpinner');
+			const phone = document.getElementById('phone');
+			const mask = IMask(phone, {
+				mask: maskOptions.mask,
+			});
+
+			// handle login
+			registerForm.addEventListener('submit', (e) => {
+				registerButton.disabled = true;
+				registerSpinner.classList.remove('d-none');
+
+				e.preventDefault();
+
+				const payload = {
+					fullName: document.getElementById('name').value,
+					password: document.getElementById('password').value,
+					email: document.getElementById('email').value,
+					address: document.getElementById('address').value,
+					birthDate: document.getElementById('dob').value,
+					gender: document.getElementById('gender').value,
+					phoneNumber: document.getElementById('phone').value,
+				};
+
+				const url = new URL('https://food-delivery.kreosoft.ru/api/account/register');
+				fetch(url, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(payload),
+				})
+					.then((response) => {
+						if (response.status === 200) {
+							response.json().then((data) => {
+								localStorage.setItem('token', data.token);
+								window.location.href = 'menu.html';
+							});
+						} else {
+							response.json().then((data) => {
+								toast.querySelector('.toast-body').innerHTML = data.message;
+								instance.show();
+							});
+						}
+					})
+					.catch((error) => {
+						toast.querySelector('.toast-body').innerHTML = error.message;
+						instance.show();
+						console.error(error);
+					})
+					.finally(() => {
+						registerButton.disabled = false;
+						registerSpinner.classList.add('d-none');
+					});
+			});
+		</script>
+	</body>
+</html>

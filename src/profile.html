@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Delivery Register</title>
+
+		<!-- bootstrap -->
+		<link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css" />
+
+		<!-- custom -->
+		<link rel="stylesheet" href="css/style.css" />
+	</head>
+
+	<body>
+		<!-- navbar section -->
+		<nav class="navbar navbar-expand-lg bg-white">
+			<div class="container py-2">
+				<a class="navbar-brand" href="#">Delivery<span>Eats</span></a>
+				<button
+					class="navbar-toggler"
+					type="button"
+					data-bs-toggle="collapse"
+					data-bs-target="#navbarSupportedContent"
+					aria-controls="navbarSupportedContent"
+					aria-expanded="false"
+					aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarSupportedContent">
+					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+						<li class="nav-item"><a class="nav-link" href="menu.html">Menu</a></li>
+						<li class="nav-item"><a class="nav-link" href="order.html">Orders</a></li>
+						<li class="nav-item"><a class="nav-link" href="cart.html">Cart</a></li>
+					</ul>
+					<div class="d-flex align-items-center">
+						<a class="nav-link active me-3" href="#" id="account">Account</a>
+						<form id="logoutForm">
+							<input type="hidden" name="token" value="" />
+							<button type="submit" class="btn btn-deats btn-md">
+								<span
+									class="spinner-border spinner-border-sm me-2 d-none"
+									role="status"
+									aria-hidden="true"
+									id="logoutSpinner">
+								</span
+								>Logout
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</nav>
+		<!-- form section -->
+		<section id="login">
+			<div class="container py-5">
+				<div class="bg-deats rounded-3 p-5 col-12 col-lg-6 mx-auto shadow-sm">
+					<h4>User Profile</h4>
+
+					<!-- profile form -->
+					<form class="mt-4" id="profileForm">
+						<div class="mb-4 row">
+							<label for="name" class="col-form-label col-4">Full Name</label>
+							<div class="col-8">
+								<input
+									type="text"
+									class="form-control col-12 col-md-8"
+									id="name"
+									placeholder="John Doe"
+									value="John Doe"
+									required />
+							</div>
+						</div>
+
+						<div class="mb-4 row">
+							<label for="email" class="col-form-label col-4">Email</label>
+							<div class="col-8">
+								<input
+									type="email"
+									class="form-control-plaintext"
+									id="email"
+									placeholder="johndoe@gmail.com"
+									value="johndoe@gmail.com" />
+							</div>
+						</div>
+
+						<div class="mb-4 row">
+							<label for="dob" class="col-form-label col-4">Date of Birth</label>
+							<div class="col-8">
+								<input type="date" class="form-control" id="dob" value="2000-01-01" required />
+							</div>
+						</div>
+
+						<div class="mb-4 row">
+							<label for="status" class="col-form-label col-4">Status</label>
+							<div class="col-8">
+								<input
+									type="text"
+									readonly
+									class="form-control-plaintext"
+									id="status"
+									placeholder="Active"
+									value="Active" />
+							</div>
+						</div>
+
+						<div class="mb-4 row">
+							<label for="address" class="col-form-label col-4">Home Address</label>
+							<div class="col-8">
+								<input
+									type="text"
+									class="form-control"
+									id="address"
+									placeholder="1234 Main St"
+									value="1234 Main St"
+									required />
+							</div>
+						</div>
+
+						<div class="mb-4 row">
+							<label for="phone" class="col-form-label col-4">Phone Number</label>
+							<div class="col-8">
+								<input
+									type="text"
+									class="form-control"
+									id="phone"
+									placeholder="+7 (000) 000-00-00-00"
+									value="+7 (000) 000-00-00-00"
+									required />
+							</div>
+						</div>
+
+						<!-- button -->
+						<div class="d-flex justify-content-end">
+							<span
+								class="spinner-border spinner-border-sm me-2 d-none"
+								role="status"
+								aria-hidden="true"
+								id="profileSpinner">
+							</span>
+							<button type="submit" class="btn btn-deats">Save Changes</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</section>
+
+		<!-- toast -->
+		<div class="toast-container position-fixed bottom-0 end-0 p-3">
+			<div
+				id="liveToast"
+				class="toast align-items-center text-bg-deats border-0"
+				role="alert"
+				aria-live="assertive"
+				aria-atomic="true">
+				<div class="d-flex">
+					<div class="toast-body"></div>
+					<button
+						type="button"
+						class="btn-close btn-close-deats me-2 m-auto"
+						data-bs-dismiss="toast"
+						aria-label="Close"></button>
+				</div>
+			</div>
+		</div>
+
+		<!-- bootstrap -->
+		<script type="text/javascript" src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+		<!-- simple input mask -->
+		<script src="https://unpkg.com/imask"></script>
+
+		<!-- custom javascript -->
+		<script>
+			const bootstrap = window.bootstrap;
+
+			const toast = document.getElementById('liveToast');
+			const instance = bootstrap.Toast.getOrCreateInstance(toast);
+
+			const logoutForm = document.getElementById('logoutForm');
+			const logoutButton = logoutForm.querySelector('button');
+			const logoutSpinner = logoutForm.querySelector('#logoutSpinner');
+
+			logoutForm.addEventListener('submit', (e) => {
+				logoutButton.disabled = true;
+				logoutSpinner.classList.remove('d-none');
+
+				e.preventDefault();
+				const url = new URL('https://food-delivery.kreosoft.ru/api/account/logout');
+				const token = localStorage.getItem('token');
+
+				fetch(url, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`,
+					},
+				})
+					.then((response) => {
+						if (response.status === 200) {
+							localStorage.removeItem('token');
+							window.location.href = 'login.html';
+						} else {
+							toast.querySelector('.toast-body').innerHTML = response.statusText;
+							instance.show();
+						}
+					})
+					.catch((error) => {
+						toast.querySelector('.toast-body').innerHTML = error.message;
+						instance.show();
+						console.error(error);
+					})
+					.finally(() => {
+						logoutButton.disabled = false;
+						logoutSpinner.classList.add('d-none');
+					});
+			});
+
+			const profileForm = document.getElementById('profileForm');
+			const profileButton = profileForm.querySelector('button');
+			const profileSpinner = profileButton.querySelector('#registerSpinner');
+			const phone = document.getElementById('phone');
+			const mask = IMask(phone, {
+				mask: '+{7} (000) 000-00-00-00',
+			});
+
+			// handle login
+			profileForm.addEventListener('submit', (e) => {
+				profileButton.disabled = true;
+				profileSpinner.classList.remove('d-none');
+
+				e.preventDefault();
+
+				const payload = {
+					fullName: document.getElementById('name').value,
+					password: document.getElementById('password').value,
+					email: document.getElementById('email').value,
+					address: document.getElementById('address').value,
+					birthDate: document.getElementById('dob').value,
+					gender: document.getElementById('gender').value,
+					phoneNumber: document.getElementById('phone').value,
+				};
+
+				const url = new URL('https://food-delivery.kreosoft.ru/api/account/register');
+				fetch(url, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(payload),
+				})
+					.then((response) => {
+						if (response.status === 200) {
+							response.json().then((data) => {
+								localStorage.setItem('token', data.token);
+								window.location.href = 'menu.html';
+							});
+						} else {
+							response.json().then((data) => {
+								toast.querySelector('.toast-body').innerHTML = data.message;
+								instance.show();
+							});
+						}
+					})
+					.catch((error) => {
+						toast.querySelector('.toast-body').innerHTML = error.message;
+						instance.show();
+						console.error(error);
+					})
+					.finally(() => {
+						profileButton.disabled = false;
+						profileSpinner.classList.add('d-none');
+					});
+			});
+		</script>
+	</body>
+</html>
