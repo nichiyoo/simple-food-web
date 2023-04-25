@@ -132,3 +132,41 @@ button {
 	color: var(--deats-dark);
 	background-color: var(--deats-primary);
 }
+
+.selectpicker {
+	font-size: 0.9rem;
+	font-family: var(--font-body);
+	background-color: white;
+	border: 1px solid var(--deats-gray);
+}
+
+.filter-option-inner-inner {
+	color: var(--deats-dark);
+}
+
+.bootstrap-select .dropdown-toggle {
+	outline: none;
+	box-shadow: none;
+	border: 1px solid var(--deats-gray);
+	background-color: var(--deats-white) !important;
+}
+
+.bootstrap-select .dropdown-toggle:focus,
+.bootstrap-select .dropdown-toggle:active {
+	outline: none !important;
+	box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.bootstrap-select .dropdown-menu {
+	font-size: 0.9rem;
+	font-family: var(--font-body);
+}
+
+.bootstrap-select .dropdown-item:focus {
+	color: var(--deats-dark);
+	background-color: var(--deats-ash);
+}
+
+.bootstrap-select .check-mark {
+	color: var(--deats-primary);
+}

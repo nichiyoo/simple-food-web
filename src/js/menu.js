@@ -7,6 +7,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	const foodContainer = document.getElementById('foodContainer');
 
+	async function getFood({ page, sorting, categories, vegetarian }) {
+		const url = new URL('https://food-delivery.kreosoft.ru/api/dish');
+		const target = new URL(window.location.origin + window.location.pathname);
+
+		const param = new URLSearchParams();
+		page && param.set('page', page);
+		sorting && param.set('sorting', sorting);
+		vegetarian && param.set('vegetarian', vegetarian);
+		categories && categories.forEach((category) => param.append('categories', category));
+
+		url.search = param;
+		target.search = param;
+		window.history.pushState({}, '', target);
+
+		const response = await fetch(url);
+		const data = await response.json();
+		return data;
+	}
+
 	getFood({})
 		.then((data) => {
 			const { dishes, pagination } = data;
@@ -23,12 +42,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		const filterDataObj = {
 			vegetarian: filterForm.querySelector('#vegetarian').checked,
-			categories: filterForm.querySelector('#categories').value,
+			categories: $('#categories').selectpicker().val(),
 			sorting: filterForm.querySelector('#sorting').value,
 		};
 
-		filterDataObj.categories === 'All' && delete filterDataObj.categories;
 		filterDataObj.sorting === 'Default' && delete filterDataObj.sorting;
+		filterDataObj.categories.length === 0 && delete filterDataObj.categories;
 
 		try {
 			const data = await getFood(filterDataObj);
@@ -64,25 +83,6 @@ function activateButton(button, spinner) {
 function deactivateButton(button, spinner) {
 	button.disabled = true;
 	spinner.classList.remove('d-none');
-}
-
-async function getFood({ page, sorting, categories, vegetarian }) {
-	const url = new URL('https://food-delivery.kreosoft.ru/api/dish');
-	const target = new URL(window.location.origin + window.location.pathname);
-
-	const param = new URLSearchParams();
-	page && param.set('page', page);
-	sorting && param.set('sorting', sorting);
-	categories && param.set('categories', categories);
-	vegetarian && param.set('vegetarian', vegetarian);
-
-	url.search = param;
-	target.search = param;
-	window.history.pushState({}, '', target);
-
-	const response = await fetch(url);
-	const data = await response.json();
-	return data;
 }
 
 function renderEmptyCard(container) {
@@ -124,7 +124,7 @@ function renderCard(dishes, container) {
 		rating = Math.ceil(dish.rating / 2);
 
 		card.innerHTML = `
-		<div class="card rounded-3 overflow-hidden position-relative">
+		<div class="card h-100 rounded-3 overflow-hidden position-relative">
 			<img
 				src="${image}"
 				class="card-img-top object-fit-cover"
@@ -135,9 +135,9 @@ function renderCard(dishes, container) {
 					<p>${category}</p>
 					<p id="star" aria-label="${rating}"></p>
 				</div>
-				<p>${description}</p>
+				<p class="pb-5">${description}</p>
 			</div>
-			<div class="card-footer bg-white d-flex justify-content-between align-items-center">
+			<div class="card-footer w-100 position-absolute bottom-0 bg-white d-flex justify-content-between align-items-center">
 				<span>$${price}</span>
 				<a href="/order.html?id=${id}" class="btn btn-deats">Order</a>
 			</div>
