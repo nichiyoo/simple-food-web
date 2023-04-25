@@ -97,15 +97,16 @@ button {
 	color: var(--deats-text);
 }
 
-#foodCard .category {
+.category {
 	color: var(--deats-primary);
 }
 
-#singleStar {
+.star {
+	width: 1.2rem;
 	fill: var(--deats-gray);
 }
 
-#singleStar.active {
+.star.active {
 	fill: var(--deats-primary);
 }
 
@@ -114,8 +115,16 @@ button {
 	color: var(--deats-text);
 }
 
-.page-item:hover .page-link {
+.page-link,
+.page-item {
+	box-shadow: none !important;
+}
+
+.page-link:focus,
+.page-link:hover,
+.page-link:active {
 	color: var(--deats-dark);
+	background-color: var(--deats-primary);
 }
 
 .vegetarian {

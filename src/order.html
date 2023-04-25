@@ -4,7 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Delivery Order</title>
+		<title>Delivery Menu</title>
 
 		<!-- bootstrap -->
 		<link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css" />
@@ -61,25 +61,20 @@
 					<form action="" class="d-flex justify-content-between" id="filterForm">
 						<div class="col-8 row">
 							<div class="col-3 d-flex flex-column justify-content-between">
-								<label for="categories" class="form-label">Category</label>
-								<select class="form-select" id="categories">
-									<option value="wok">Wok</option>
+								<label for="category" class="form-label">Category</label>
+								<select class="form-select" id="category">
+									<option value="all">All</option>
 									<option value="pizza">Pizza</option>
-									<option value="soup">Soup</option>
-									<option value="dessert">Dessert</option>
-									<option value="drink">Drink</option>
+									<option value="burger">Burger</option>
+									<option value="pasta">Pasta</option>
 								</select>
 							</div>
 
 							<div class="col-3 d-flex flex-column justify-content-between">
-								<label for="sorting" class="form-label">Sort</label>
-								<select class="form-select" id="sorting">
-									<option value="NameAsc">Name (A-Z)</option>
-									<option value="NameDesc">Name (Z-A)</option>
-									<option value="PriceAsc">Price (Low to High)</option>
-									<option value="PriceDesc">Price (High to Low)</option>
-									<option value="RatingAsc">Rating (Low to High)</option>
-									<option value="RatingDesc">Rating (High to Low)</option>
+								<label for="sort" class="form-label">Sort</label>
+								<select class="form-select" id="sort">
+									<option value="asc">Ascending</option>
+									<option value="desc">Descending</option>
 								</select>
 							</div>
 
@@ -122,6 +117,102 @@
 							<li class="page-item"><a class="page-link" href="#">Next</a></li>
 						</ul>
 					</nav>
+
+					<script>
+						const cardContainer = document.getElementById('cardContainer');
+
+						function createCard() {
+							let card = document.createElement('div');
+							card.classList.add('col');
+							card.id = 'foodCard';
+
+							card.innerHTML = `<div class="card rounded-3 overflow-hidden">
+								<img
+									src="../public/img/food.jpg"
+									class="card-img-top object-fit-cover"
+									alt="food image" />
+								<div class="p-4">
+									<h6>Card title</h6>
+									<p class="category">Card title</p>
+									<p>
+										Some quick example text to build on the card title and make up the bulk of the
+										card's content.
+									</p>
+									<div id="starContainer" value="4">
+
+									</div>
+								</div>
+								<div class="card-footer bg-white d-flex justify-content-between align-items-center">
+									<span>$20</span>
+									<a href="#" class="btn btn-deats">Order</a>
+								</div>
+							</div>
+							`;
+							return card;
+						}
+
+						function createStar() {
+							return `<svg
+								xmlns="http://www.w3.org/2000/svg"
+								enable-background="new 0 0 24 24"
+								height="24px"
+								viewBox="0 0 24 24"
+								width="24px"
+								fill="#000000"
+								id="singleStar"
+								class="active">
+								<g>
+									<path d="M0 0h24v24H0V0z" fill="none" />
+									<path d="M0 0h24v24H0V0z" fill="none" />
+								</g>
+								<g>
+									<path
+										d="m12 17.27 4.15 2.51c.76.46 1.69-.22 1.49-1.08l-1.1-4.72 3.67-3.18c.67-.58.31-1.68-.57-1.75l-4.83-.41-1.89-4.46c-.34-.81-1.5-.81-1.84 0L9.19 8.63l-4.83.41c-.88.07-1.24 1.17-.57 1.75l3.67 3.18-1.1 4.72c-.2.86.73 1.54 1.49 1.08l4.15-2.5z" />
+								</g>
+							</svg>`;
+						}
+
+						let data = Array.from({ length: 3 }).map(() => {
+							return createCard();
+						});
+
+						data.forEach((card) => {
+							cardContainer.appendChild(card);
+						});
+
+						const filterForm = document.getElementById('filterForm');
+						const filterButton = filterForm.querySelector('button');
+						const filterSpinner = filterForm.querySelector('#filterSpinner');
+
+						filterForm.addEventListener('submit', (e) => {
+							filterButton.disabled = true;
+							filterSpinner.classList.remove('d-none');
+
+							e.preventDefault();
+
+							let formData = {
+								category: document.getElementById('category').value,
+								sort: document.getElementById('sort').value,
+								vegetarian: document.getElementById('vegetarian').checked,
+							};
+
+							console.log(formData);
+
+							setTimeout(() => {
+								data = Array.from({ length: Math.floor(Math.random() * 10) }).map(() => {
+									return createCard();
+								});
+
+								cardContainer.innerHTML = '';
+								data.forEach((card) => {
+									cardContainer.appendChild(card);
+								});
+
+								filterButton.disabled = false;
+								filterSpinner.classList.add('d-none');
+							}, 2000);
+						});
+					</script>
 				</div>
 			</div>
 		</section>
@@ -191,162 +282,6 @@
 					.finally(() => {
 						logoutButton.disabled = false;
 						logoutSpinner.classList.add('d-none');
-					});
-			});
-		</script>
-
-		<script>
-			const cardContainer = document.getElementById('cardContainer');
-
-			async function getFood({ vegetarian, page, categories, sorting }) {
-				const url = new URL('https://food-delivery.kreosoft.ru/api/dish');
-
-				vegetarian && url.searchParams.set('vegetarian', vegetarian);
-				page && url.searchParams.set('page', page);
-				categories && url.searchParams.set('categories', categories);
-				sorting && url.searchParams.set('sorting', sorting);
-
-				const response = await fetch(url);
-				const data = await response.json();
-
-				// change window url
-				const urlParams = new URLSearchParams(window.location.search);
-				vegetarian && urlParams.set('vegetarian', vegetarian);
-				page && urlParams.set('page', page);
-				categories && urlParams.set('categories', categories);
-				sorting && urlParams.set('sorting', sorting);
-				window.history.pushState({}, '', `${window.location.pathname}?${urlParams}`);
-
-				return data;
-			}
-
-			function createCard({ id, name, description, price, image, vegetarian, rating, category }) {
-				let card = document.createElement('div');
-				card.classList.add('col');
-				card.id = 'foodCard';
-
-				card.innerHTML = `<div class="card rounded-3 overflow-hidden position-relative">
-					<img
-						src="${image}"
-						class="card-img-top object-fit-cover"
-						alt="${name}" />
-					<div class="p-4">
-						<h6>${name}</h6>
-						<p class="category">${category}</p>
-						<p>
-							${description}
-						</p>
-						<div id="starContainer" value="${Math.ceil(rating)}">
-						</div>
-					</div>
-					<div class="card-footer bg-white d-flex justify-content-between align-items-center">
-						<span>$${price}</span>
-						<a href="/order.html?id=${id}" class="btn btn-deats">Order</a>
-					</div>
-					${vegetarian ? '<span class="vegetarian position-absolute top-0 end-0 px-2 py-1 rounded-3 m-2">Vegetarian</span>' : ''}
-				</div>
-				`;
-				return card;
-			}
-
-			function createStar() {
-				return `<svg
-					xmlns="http://www.w3.org/2000/svg"
-					enable-background="new 0 0 24 24"
-					height="24px"
-					viewBox="0 0 24 24"
-					width="24px"
-					fill="#000000"
-					id="singleStar"
-					class="active">
-					<g>
-						<path d="M0 0h24v24H0V0z" fill="none" />
-						<path d="M0 0h24v24H0V0z" fill="none" />
-					</g>
-					<g>
-						<path
-							d="m12 17.27 4.15 2.51c.76.46 1.69-.22 1.49-1.08l-1.1-4.72 3.67-3.18c.67-.58.31-1.68-.57-1.75l-4.83-.41-1.89-4.46c-.34-.81-1.5-.81-1.84 0L9.19 8.63l-4.83.41c-.88.07-1.24 1.17-.57 1.75l3.67 3.18-1.1 4.72c-.2.86.73 1.54 1.49 1.08l4.15-2.5z" />
-					</g>
-				</svg>`;
-			}
-			const star = createStar();
-
-			getFood({ categories: 'Wok' })
-				.then((data) => {
-					const { dishes, target } = data;
-
-					dishes.forEach((dish) => {
-						const card = createCard(dish);
-						cardContainer.appendChild(card);
-
-						const starContainer = card.querySelector('#starContainer');
-						const rating = Math.ceil(starContainer.getAttribute('value') / 2);
-
-						for (let i = 0; i < 5; i++) {
-							if (i < rating) {
-								starContainer.innerHTML += star;
-							} else {
-								starContainer.innerHTML += star;
-								starContainer.lastChild.classList.remove('active');
-							}
-						}
-					});
-				})
-				.catch((err) => {
-					toast.querySelector('.toast-body').innerHTML = error.message;
-					instance.show();
-					console.error(error);
-				});
-
-			const filterForm = document.getElementById('filterForm');
-			const filterButton = filterForm.querySelector('button');
-			const filterSpinner = filterForm.querySelector('#filterSpinner');
-
-			filterForm.addEventListener('submit', (e) => {
-				filterButton.disabled = true;
-				filterSpinner.classList.remove('d-none');
-
-				e.preventDefault();
-
-				const filterData = {
-					vegetarian: filterForm.vegetarian.checked,
-					categories: filterForm.categories.value,
-					sorting: filterForm.sorting.value,
-				};
-
-				console.log(filterData);
-
-				getFood(filterData)
-					.then((data) => {
-						const { dishes, pagination } = data;
-
-						cardContainer.innerHTML = '';
-
-						dishes.forEach((dish) => {
-							const card = createCard(dish);
-							cardContainer.appendChild(card);
-
-							const starContainer = card.querySelector('#starContainer');
-							const rating = Math.ceil(starContainer.getAttribute('value') / 2);
-
-							for (let i = 0; i < 5; i++) {
-								if (i < rating) {
-									starContainer.innerHTML += star;
-								} else {
-									starContainer.innerHTML += star;
-									starContainer.lastChild.classList.remove('active');
-								}
-							}
-						});
-					})
-					.catch((err) => {
-						toast.querySelector('.toast-body').innerHTML = error.message;
-						instance.show();
-						console.error(error);
-					})
-					.finally(() => {
-						filterButton.disabled = false;
-						filterSpinner.classList.add('d-none');
 					});
 			});
 		</script>

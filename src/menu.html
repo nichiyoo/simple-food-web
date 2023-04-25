@@ -4,13 +4,13 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Delivery Menu</title>
+		<title>Delivery Order</title>
 
-		<!-- bootstrap -->
 		<link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css" />
-
-		<!-- custom -->
 		<link rel="stylesheet" href="css/style.css" />
+		<script type="text/javascript" src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+		<script type="text/javascript" src="js/order.js"></script>
+		<script type="text/javascript" src="js/logout.js"></script>
 	</head>
 
 	<body>
@@ -37,7 +37,6 @@
 					<div class="d-flex align-items-center">
 						<a class="nav-link me-3" href="profile.html" id="account">Account</a>
 						<form id="logoutForm">
-							<input type="hidden" name="token" value="" />
 							<button type="submit" class="btn btn-deats btn-md">
 								<span
 									class="spinner-border spinner-border-sm me-2 d-none"
@@ -57,24 +56,30 @@
 		<section id="menu">
 			<div class="container py-5">
 				<div class="bg-deats rounded-3 p-5 shadow-sm">
-					<!-- filter section -->
 					<form action="" class="d-flex justify-content-between" id="filterForm">
 						<div class="col-8 row">
 							<div class="col-3 d-flex flex-column justify-content-between">
-								<label for="category" class="form-label">Category</label>
-								<select class="form-select" id="category">
-									<option value="all">All</option>
-									<option value="pizza">Pizza</option>
-									<option value="burger">Burger</option>
-									<option value="pasta">Pasta</option>
+								<label for="categories" class="form-label">Category</label>
+								<select class="form-select" id="categories">
+									<option selected value="All">All</option>
+									<option value="Wok">Wok</option>
+									<option value="Pizza">Pizza</option>
+									<option value="Soup">Soup</option>
+									<option value="Dessert">Dessert</option>
+									<option value="Drink">Drink</option>
 								</select>
 							</div>
 
 							<div class="col-3 d-flex flex-column justify-content-between">
-								<label for="sort" class="form-label">Sort</label>
-								<select class="form-select" id="sort">
-									<option value="asc">Ascending</option>
-									<option value="desc">Descending</option>
+								<label for="sorting" class="form-label">Sort</label>
+								<select class="form-select" id="sorting">
+									<option selected value="Default">Default</option>
+									<option value="NameAsc">Name (A-Z)</option>
+									<option value="NameDesc">Name (Z-A)</option>
+									<option value="PriceAsc">Price (Low to High)</option>
+									<option value="PriceDesc">Price (High to Low)</option>
+									<option value="RatingAsc">Rating (Low to High)</option>
+									<option value="RatingDesc">Rating (High to Low)</option>
 								</select>
 							</div>
 
@@ -92,6 +97,7 @@
 								</div>
 							</div>
 						</div>
+
 						<div class="d-flex align-items-end">
 							<button type="submit" class="btn btn-deats btn-md">
 								<span
@@ -105,114 +111,25 @@
 						</div>
 					</form>
 
-					<!-- menu items -->
-					<div class="mt-4 row row-cols-4 g-4" id="cardContainer"></div>
-
-					<nav class="mt-4">
-						<ul class="pagination">
-							<li class="page-item"><a class="page-link" href="#">Previous</a></li>
-							<li class="page-item"><a class="page-link" href="#">1</a></li>
-							<li class="page-item"><a class="page-link" href="#">2</a></li>
-							<li class="page-item"><a class="page-link" href="#">3</a></li>
-							<li class="page-item"><a class="page-link" href="#">Next</a></li>
-						</ul>
-					</nav>
-
-					<script>
-						const cardContainer = document.getElementById('cardContainer');
-
-						function createCard() {
-							let card = document.createElement('div');
-							card.classList.add('col');
-							card.id = 'foodCard';
-
-							card.innerHTML = `<div class="card rounded-3 overflow-hidden">
-								<img
-									src="../public/img/food.jpg"
-									class="card-img-top object-fit-cover"
-									alt="food image" />
-								<div class="p-4">
-									<h6>Card title</h6>
-									<p class="category">Card title</p>
-									<p>
-										Some quick example text to build on the card title and make up the bulk of the
-										card's content.
-									</p>
-									<div id="starContainer" value="4">
-
-									</div>
-								</div>
-								<div class="card-footer bg-white d-flex justify-content-between align-items-center">
-									<span>$20</span>
-									<a href="#" class="btn btn-deats">Order</a>
-								</div>
+					<div class="mt-4 row row-cols-4 g-4" id="foodContainer">
+						<div class="col-12">
+							<div class="d-flex py-5 justify-content-center align-items-center text-center">
+								<h6>Fetching Data</h6>
 							</div>
-							`;
-							return card;
-						}
+						</div>
+					</div>
 
-						function createStar() {
-							return `<svg
-								xmlns="http://www.w3.org/2000/svg"
-								enable-background="new 0 0 24 24"
-								height="24px"
-								viewBox="0 0 24 24"
-								width="24px"
-								fill="#000000"
-								id="singleStar"
-								class="active">
-								<g>
-									<path d="M0 0h24v24H0V0z" fill="none" />
-									<path d="M0 0h24v24H0V0z" fill="none" />
-								</g>
-								<g>
-									<path
-										d="m12 17.27 4.15 2.51c.76.46 1.69-.22 1.49-1.08l-1.1-4.72 3.67-3.18c.67-.58.31-1.68-.57-1.75l-4.83-.41-1.89-4.46c-.34-.81-1.5-.81-1.84 0L9.19 8.63l-4.83.41c-.88.07-1.24 1.17-.57 1.75l3.67 3.18-1.1 4.72c-.2.86.73 1.54 1.49 1.08l4.15-2.5z" />
-								</g>
-							</svg>`;
-						}
-
-						let data = Array.from({ length: 3 }).map(() => {
-							return createCard();
-						});
-
-						data.forEach((card) => {
-							cardContainer.appendChild(card);
-						});
-
-						const filterForm = document.getElementById('filterForm');
-						const filterButton = filterForm.querySelector('button');
-						const filterSpinner = filterForm.querySelector('#filterSpinner');
-
-						filterForm.addEventListener('submit', (e) => {
-							filterButton.disabled = true;
-							filterSpinner.classList.remove('d-none');
-
-							e.preventDefault();
-
-							let formData = {
-								category: document.getElementById('category').value,
-								sort: document.getElementById('sort').value,
-								vegetarian: document.getElementById('vegetarian').checked,
-							};
-
-							console.log(formData);
-
-							setTimeout(() => {
-								data = Array.from({ length: Math.floor(Math.random() * 10) }).map(() => {
-									return createCard();
-								});
-
-								cardContainer.innerHTML = '';
-								data.forEach((card) => {
-									cardContainer.appendChild(card);
-								});
-
-								filterButton.disabled = false;
-								filterSpinner.classList.add('d-none');
-							}, 2000);
-						});
-					</script>
+					<div class="d-flex justify-content-center">
+						<nav class="mt-4">
+							<ul class="pagination mx-auto">
+								<li class="page-item"><a class="page-link" href="#">Previous</a></li>
+								<li class="page-item"><a class="page-link" href="#">1</a></li>
+								<li class="page-item"><a class="page-link" href="#">2</a></li>
+								<li class="page-item"><a class="page-link" href="#">3</a></li>
+								<li class="page-item"><a class="page-link" href="#">Next</a></li>
+							</ul>
+						</nav>
+					</div>
 				</div>
 			</div>
 		</section>
@@ -235,55 +152,5 @@
 				</div>
 			</div>
 		</div>
-
-		<!-- bootstrap -->
-		<script type="text/javascript" src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-		<!-- script for login form -->
-		<script>
-			const bootstrap = window.bootstrap;
-
-			const toast = document.getElementById('liveToast');
-			const instance = bootstrap.Toast.getOrCreateInstance(toast);
-
-			const logoutForm = document.getElementById('logoutForm');
-			const logoutButton = logoutForm.querySelector('button');
-			const logoutSpinner = logoutForm.querySelector('#logoutSpinner');
-
-			logoutForm.addEventListener('submit', (e) => {
-				logoutButton.disabled = true;
-				logoutSpinner.classList.remove('d-none');
-
-				e.preventDefault();
-				const url = new URL('https://food-delivery.kreosoft.ru/api/account/logout');
-				const token = localStorage.getItem('token');
-
-				fetch(url, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${token}`,
-					},
-				})
-					.then((response) => {
-						if (response.status === 200) {
-							localStorage.removeItem('token');
-							window.location.href = 'login.html';
-						} else {
-							toast.querySelector('.toast-body').innerHTML = response.statusText;
-							instance.show();
-						}
-					})
-					.catch((error) => {
-						toast.querySelector('.toast-body').innerHTML = error.message;
-						instance.show();
-						console.error(error);
-					})
-					.finally(() => {
-						logoutButton.disabled = false;
-						logoutSpinner.classList.add('d-none');
-					});
-			});
-		</script>
 	</body>
 </html>
