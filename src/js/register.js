@@ -1,83 +1,107 @@
+localStorage.getItem('token') && (window.location.href = 'menu.html');
+
 document.addEventListener('DOMContentLoaded', function () {
 	const bootstrap = window.bootstrap;
 	const setMask = window.IMask;
 
-	const registerForm = document.getElementById('registerForm');
-	const registerButton = registerForm.querySelector('button');
-	const registerSpinner = registerButton.querySelector('#registerSpinner');
-
 	const phone = document.getElementById('phone');
 	setMask(phone, { mask: '+{7} (000) 000-00-00' });
 
-	registerForm.addEventListener('submit', async (event) => {
-		deactivateButton(registerButton, registerSpinner);
+	const form = document.getElementById('registerForm');
+	form.addEventListener('submit', async (event) => {
 		event.preventDefault();
 
-		if (!registerForm.checkValidity()) {
+		const button = form.querySelector('button');
+		const spinner = button.querySelector('span');
+		deactivateButton(button, spinner);
+
+		form.classList.remove('was-validated');
+		form.querySelectorAll('.is-invalid').forEach((element) => {
+			element.classList.remove('is-invalid');
+		});
+
+		if (!form.checkValidity()) {
 			event.stopPropagation();
-			activateButton(registerButton, registerSpinner);
+			setTimeout(() => {
+				form.classList.add('was-validated');
+				activateButton(button, spinner);
+			}, 1500);
+			return;
 		}
 
-		registerForm.classList.add('was-validated');
-
 		const registerData = {
-			fullName: registerForm.elements.name.value,
-			password: registerForm.elements.password.value,
-			email: registerForm.elements.email.value,
-			address: registerForm.elements.address.value,
-			birthDate: new Date(registerForm.elements.dob.value).toISOString(),
-			gender: registerForm.elements.gender.value,
-			phoneNumber: registerForm.elements.phone.value,
+			fullName: form.elements.name.value,
+			password: form.elements.password.value,
+			email: form.elements.email.value,
+			address: form.elements.address.value,
+			birthDate: new Date(form.elements.dob.value).toISOString(),
+			gender: form.elements.gender.value,
+			phoneNumber: form.elements.phone.value,
 		};
 
 		try {
 			const url = new URL('https://food-delivery.kreosoft.ru/api/account/register');
+			const header = new Headers();
+			header.append('Content-Type', 'application/json');
+
 			const response = await fetch(url, {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
+				headers: header,
 				body: JSON.stringify(registerData),
 			});
 
+			const data = await response.json();
+
 			if (response.ok) {
-				const data = await response.json();
 				localStorage.setItem('token', data.token);
 				window.location.href = 'menu.html';
 			} else {
-				const data = await response.json();
-
 				if (Object.keys(data).includes('DuplicateUserName')) {
-					const email = registerForm.elements.email;
+					const email = form.elements.email;
+					const message = data.DuplicateUserName.join(' ');
+
 					email.classList.add('is-invalid');
-					email.nextElementSibling.innerHTML = data.DuplicateUserName[0];
-					activateButton(registerButton, registerSpinner);
+					email.nextElementSibling.innerHTML = message;
+
+					form.classList.add('was-validated');
+					activateButton(button, spinner);
 					return;
 				}
 
-				const { errors } = data;
+				const { errors, title } = data;
+
 				Object.keys(errors).forEach((key) => {
-					const input = registerForm.elements[key.toLowerCase()];
+					let input = null;
+					const message = errors[key].join(' ');
+
+					if (key === 'BirthDate') input = form.elements.dob;
+					else input = form.elements[key.toLowerCase()];
+
 					input.classList.add('is-invalid');
-					input.nextElementSibling.innerHTML = errors[key][0];
+					input.nextElementSibling.innerHTML = message;
+
+					form.classList.add('was-validated');
+					activateButton(button, spinner);
 				});
 
-				triggerToast(data.title);
+				triggerToast(title);
 			}
 		} catch (error) {
-			triggerToast(error.message);
 			console.error(error);
+			triggerToast(error.message);
 		}
 
-		activateButton(registerButton, registerSpinner);
+		activateButton(button, spinner);
 	});
 
 	function triggerToast(message) {
 		const toast = document.getElementById('liveToast');
 		const trigger = bootstrap.Toast.getOrCreateInstance(toast);
-
 		toast.querySelector('.toast-body').innerHTML = message;
 		trigger.show();
+		setTimeout(() => {
+			trigger.hide();
+		}, 1500);
 	}
 });
 

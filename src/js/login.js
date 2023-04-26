@@ -1,15 +1,29 @@
+localStorage.getItem('token') && (window.location.href = 'menu.html');
+
 document.addEventListener('DOMContentLoaded', function () {
 	const bootstrap = window.bootstrap;
 
-	const loginForm = document.getElementById('loginForm');
-	const loginButton = loginForm.querySelector('button');
-	const loginSpinner = loginButton.querySelector('#loginSpinner');
+	const form = document.getElementById('loginForm');
+	form.addEventListener('submit', async (event) => {
+		event.preventDefault();
 
-	loginForm.addEventListener('submit', async (e) => {
-		loginButton.disabled = true;
-		loginSpinner.classList.remove('d-none');
+		const button = form.querySelector('button');
+		const spinner = button.querySelector('span');
+		deactivateButton(button, spinner);
 
-		e.preventDefault();
+		form.classList.remove('was-validated');
+		form.querySelectorAll('.is-invalid').forEach((element) => {
+			element.classList.remove('is-invalid');
+		});
+
+		if (!form.checkValidity()) {
+			event.stopPropagation();
+			setTimeout(() => {
+				form.classList.add('was-validated');
+				activateButton(button, spinner);
+			}, 1500);
+			return;
+		}
 
 		const loginData = {
 			email: document.getElementById('email').value,
@@ -18,29 +32,36 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		try {
 			const url = new URL('https://food-delivery.kreosoft.ru/api/account/login');
+			const header = new Headers();
+			header.append('Content-Type', 'application/json');
+
 			const response = await fetch(url, {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
+				headers: header,
 				body: JSON.stringify(loginData),
 			});
 
+			const data = await response.json();
+
 			if (response.ok) {
-				const data = await response.json();
 				localStorage.setItem('token', data.token);
 				window.location.href = 'menu.html';
 			} else {
-				const data = await response.json();
-				triggerToast(data.message);
+				form.querySelector('#email').classList.add('is-invalid');
+				form.querySelector('#password').classList.add('is-invalid');
+
+				form.querySelector('#email').nextElementSibling.innerHTML = 'Please check your email.';
+				form.querySelector('#password').nextElementSibling.innerHTML = 'Please check your password.';
+
+				form.classList.add('was-validated');
+				activateButton(button, spinner);
 			}
 		} catch (error) {
-			triggerToast(error.message);
 			console.error(error);
+			triggerToast(error.message);
 		}
 
-		loginButton.disabled = false;
-		loginSpinner.classList.add('d-none');
+		activateButton(button, spinner);
 	});
 
 	function triggerToast(message) {
@@ -48,5 +69,18 @@ document.addEventListener('DOMContentLoaded', function () {
 		const trigger = bootstrap.Toast.getOrCreateInstance(toast);
 		toast.querySelector('.toast-body').innerHTML = message;
 		trigger.show();
+		setTimeout(() => {
+			trigger.hide();
+		}, 1500);
 	}
 });
+
+function activateButton(button, spinner) {
+	button.disabled = false;
+	spinner.classList.add('d-none');
+}
+
+function deactivateButton(button, spinner) {
+	button.disabled = true;
+	spinner.classList.remove('d-none');
+}

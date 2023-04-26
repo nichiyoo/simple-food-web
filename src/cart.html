@@ -4,7 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Delivery Order</title>
+		<title>Delivery Cart</title>
 
 		<link rel="apple-touch-icon" sizes="76x76" href="../public/apple-touch-icon.png" />
 		<link rel="icon" type="image/png" sizes="32x32" href="../public/favicon-32x32.png" />
@@ -15,16 +15,13 @@
 		<meta name="theme-color" content="#ffffff" />
 
 		<link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css" />
-		<link rel="stylesheet" href="vendor/bootstrap-select/css/bootstrap-select.min.css" />
 		<link rel="stylesheet" href="css/style.css" />
 
 		<script type="text/javascript" src="vendor/jquery/jquery-3.6.4.min.js"></script>
 		<script type="text/javascript" src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-		<script type="text/javascript" src="vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
-		<script type="text/javascript" src="vendor/jquery/pagination.js"></script>
 
 		<script type="text/javascript" src="js/navbar.js"></script>
-		<script type="text/javascript" src="js/menu.js"></script>
+		<script type="text/javascript" src="js/cart.js"></script>
 	</head>
 
 	<body>
@@ -46,7 +43,7 @@
 					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 						<li class="nav-item"><a class="nav-link" href="menu.html">Menu</a></li>
 						<li class="nav-item"><a class="nav-link" href="order.html">Orders</a></li>
-						<li class="nav-item"><a class="nav-link" href="cart.html">Cart</a></li>
+						<li class="nav-item"><a class="nav-link active" href="cart.html">Cart</a></li>
 					</ul>
 					<div class="d-flex align-items-center">
 						<a class="nav-link me-3" href="profile.html" id="account">Account</a>
@@ -66,79 +63,16 @@
 		</nav>
 
 		<!-- menu section -->
-		<section id="menu">
+		<section id="cart">
 			<div class="container py-5">
-				<div class="bg-white rounded-3 p-5 shadow-sm">
-					<form class="d-flex justify-content-between flex-column flex-lg-row" id="filterForm">
-						<div class="w-100 row">
-							<div class="col-12 col-lg-3 mb-4 mb-lg-0 d-flex flex-column justify-content-between">
-								<label for="categories" class="form-label">Category</label>
-								<select
-									class="selectpicker form-control"
-									name="categories"
-									id="categories"
-									title="All"
-									multiple
-									data-selected-text-format="count">
-									<option value="Wok">Wok</option>
-									<option value="Pizza">Pizza</option>
-									<option value="Soup">Soup</option>
-									<option value="Dessert">Dessert</option>
-									<option value="Drink">Drink</option>
-								</select>
-							</div>
-
-							<div class="col-12 col-lg-3 mb-4 mb-lg-0 d-flex flex-column justify-content-between">
-								<label for="sorting" class="form-label">Sort</label>
-								<select class="selectpicker form-control" name="sorting" id="sorting" title="Default">
-									<option value="NameAsc">Name (A-Z)</option>
-									<option value="NameDesc">Name (Z-A)</option>
-									<option value="PriceAsc">Price (Low to High)</option>
-									<option value="PriceDesc">Price (High to Low)</option>
-									<option value="RatingAsc">Rating (Low to High)</option>
-									<option value="RatingDesc">Rating (High to Low)</option>
-								</select>
-							</div>
-
-							<div class="col-12 col-lg-6 mb-4 mb-lg-0 d-flex flex-column justify-content-between">
-								<label for="vegetarian" class="form-label">Option</label>
-								<div class="form-check form-switch">
-									<input
-										class="form-check-input mb-2"
-										type="checkbox"
-										role="switch"
-										id="vegetarian" />
-									<label class="form-check-label" for="vegetarian">
-										Show only vegetarian dishes
-									</label>
-								</div>
-							</div>
-						</div>
-
-						<div class="d-flex align-items-end">
-							<button type="submit" class="btn btn-deats btn-md w-100 w-lg-auto">
-								<span
-									class="spinner-border spinner-border-sm me-2 d-none"
-									role="status"
-									aria-hidden="true">
-								</span>
-								Filter
-							</button>
-						</div>
-					</form>
-
-					<div class="mt-4 row row-cols-4 g-4" id="foodContainer">
+				<div class="bg-white rounded-3 p-5 col-12 col-xl-6 mx-auto shadow-sm">
+					<h4>Your Cart</h4>
+					<div id="cartContainer" class="mt-4">
 						<div class="col-12">
 							<div class="d-flex py-5 justify-content-center align-items-center text-center">
-								<h6>Fetching Data</h6>
+								<h6>Fetching data</h6>
 							</div>
 						</div>
-					</div>
-
-					<div class="d-flex justify-content-center">
-						<nav class="mt-4" id="pagination">
-							<ul class="pagination"></ul>
-						</nav>
 					</div>
 				</div>
 			</div>

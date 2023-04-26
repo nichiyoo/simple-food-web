@@ -43,10 +43,26 @@ button {
 	font-family: var(--font-body);
 }
 
+/* for toast */
+.text-bg-deats {
+	color: var(--deats-dark);
+	background-color: var(--deats-primary);
+}
+
+.btn-close-deats {
+	color: var(--deats-dark);
+	background-color: var(--deats-primary);
+}
+/* end toast */
+
+.text-deats {
+	color: var(--deats-text);
+}
+
 .btn-deats {
+	border: none;
 	color: var(--deats-text);
 	background-color: var(--deats-ash);
-	border: none;
 }
 
 .btn-deats:hover,
@@ -55,8 +71,9 @@ button {
 	background-color: var(--deats-primary);
 }
 
-.bg-deats {
-	background-color: var(--deats-white);
+.btn-deats:disabled {
+	color: var(--deats-text);
+	background-color: var(--deats-ash);
 }
 
 .navbar-brand {
@@ -83,18 +100,36 @@ button {
 	color: var(--deats-dark);
 }
 
-.text-bg-deats {
+/* navlink for cart.html */
+a.nav-link[href='cart.html'] {
+	position: relative;
+}
+
+a.nav-link[href='cart.html']::after {
+	content: attr(data-count);
+	position: absolute;
+	top: 50%;
+	right: -0.5rem;
+	border-radius: 50%;
+	transform: translate(50%, -50%);
+
+	height: 1rem;
+	width: 1rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	font-size: 0.7rem;
+	font-weight: bold;
 	color: var(--deats-dark);
 	background-color: var(--deats-primary);
 }
 
-.btn-close-deats {
-	color: var(--deats-dark);
-	background-color: var(--deats-primary);
-}
-
-.text-deats {
-	color: var(--deats-text);
+@media (max-width: 992px) {
+	a.nav-link[href='cart.html'] {
+		display: inline-block;
+		padding-right: 0.5rem;
+	}
 }
 
 .category {
@@ -110,6 +145,10 @@ button {
 	fill: var(--deats-primary);
 }
 
+.page-item * {
+	cursor: pointer;
+}
+
 .page-link {
 	font-size: 0.9rem;
 	color: var(--deats-text);
@@ -120,10 +159,20 @@ button {
 	box-shadow: none !important;
 }
 
-.page-link:focus,
 .page-link:hover,
-.page-link:active {
+.page-link.active {
 	color: var(--deats-dark);
+	background-color: var(--deats-primary);
+}
+
+.page-link:focus {
+	color: var(--deats-dark);
+	background-color: var(--deats-ash);
+}
+
+.page-item.active a {
+	color: var(--deats-dark);
+	border: 1px solid var(--deats-primary);
 	background-color: var(--deats-primary);
 }
 
@@ -169,4 +218,9 @@ button {
 
 .bootstrap-select .check-mark {
 	color: var(--deats-primary);
+}
+
+.square {
+	height: 2rem;
+	aspect-ratio: 1/1;
 }
