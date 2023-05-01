@@ -4,7 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Delivery Cart</title>
+		<title>Delivery Menu</title>
 
 		<link rel="apple-touch-icon" sizes="76x76" href="../public/apple-touch-icon.png" />
 		<link rel="icon" type="image/png" sizes="32x32" href="../public/favicon-32x32.png" />
@@ -21,7 +21,7 @@
 		<script type="text/javascript" src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 		<script type="text/javascript" src="js/navbar.js"></script>
-		<script type="text/javascript" src="js/cart.js"></script>
+		<script type="text/javascript" src="js/orders.js"></script>
 	</head>
 
 	<body>
@@ -63,11 +63,18 @@
 		</nav>
 
 		<!-- order section -->
-		<section id="cart">
+		<section id="order">
 			<div class="container py-5">
 				<div class="bg-white rounded-3 p-5 col-12 col-xl-6 mx-auto shadow-sm">
-					<h4>Your Cart</h4>
-					<div id="cartContainer" class="mt-4">
+					<div class="d-flex justify-content-between align-items-center">
+						<h4>Previous Orders</h4>
+						<a href="purchase.html" class="btn btn-deats btn-md">
+							<span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true">
+							</span>
+							Create
+						</a>
+					</div>
+					<div id="orderContainer" class="mt-4">
 						<div class="col-12">
 							<div class="d-flex py-5 justify-content-center align-items-center text-center">
 								<h6>Fetching data</h6>

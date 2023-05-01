@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (response.ok) {
 				localStorage.setItem('token', data.token);
+				localStorage.setItem('carts', []);
 				window.location.href = 'menu.html';
 			} else {
 				if (Object.keys(data).includes('DuplicateUserName')) {
@@ -97,8 +98,10 @@ document.addEventListener('DOMContentLoaded', function () {
 	function triggerToast(message) {
 		const toast = document.getElementById('liveToast');
 		const trigger = bootstrap.Toast.getOrCreateInstance(toast);
+
 		toast.querySelector('.toast-body').innerHTML = message;
 		trigger.show();
+
 		setTimeout(() => {
 			trigger.hide();
 		}, 1500);

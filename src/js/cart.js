@@ -2,28 +2,13 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 	const bootstrap = window.bootstrap;
+
 	const cartContainer = document.getElementById('cartContainer');
-	const navCart = document.querySelector('a[href="cart.html"]');
-
-	async function getCart() {
-		const token = localStorage.getItem('token');
-		const url = new URL('https://food-delivery.kreosoft.ru/api/basket');
-		const header = new Headers();
-		header.append('Content-Type', 'application/json');
-		header.append('Authorization', `Bearer ${token}`);
-
-		const response = await fetch(url, {
-			method: 'GET',
-			headers: header,
-		});
-
-		if (response.status === 401) throw new Unauthorized('Your session has expired');
-		const data = await response.json();
-		return data;
-	}
+	const counter = document.querySelector('a[href="cart.html"]');
 
 	async function updateFood(id, method) {
 		const token = localStorage.getItem('token');
+
 		const url = new URL(`https://food-delivery.kreosoft.ru/api/basket/dish/${id}`);
 		const header = new Headers();
 		header.append('Content-Type', 'application/json');
@@ -48,87 +33,80 @@ document.addEventListener('DOMContentLoaded', function () {
 		return { message: 'Something went wrong' };
 	}
 
-	getCart()
-		.then((data) => {
-			const carts = data;
+	const carts = JSON.parse(localStorage.getItem('carts')) || [];
+	console.log(carts);
 
-			if (carts.length === 0) {
-				renderEmptyCart(cartContainer);
-				return;
-			}
+	if (carts.length === 0) {
+		renderEmptyCart(cartContainer);
+		return;
+	}
 
-			renderCart(carts, cartContainer);
-			const cartCards = document.querySelectorAll('#cartCard');
+	renderCart(carts, cartContainer);
+	const cartCards = document.querySelectorAll('#cartCard');
 
-			cartCards.forEach((card) => {
-				const id = card.getAttribute('data-id');
-				const buttons = card.querySelectorAll('button');
-				const count = card.querySelector('#cartAmount');
+	cartCards.forEach((card) => {
+		const id = card.getAttribute('data-id');
+		const buttons = card.querySelectorAll('button');
+		const item = carts.find((cart) => cart.id == id);
 
-				buttons.forEach((button) => {
-					button.addEventListener('click', (e) => {
-						e.preventDefault();
+		const count = card.querySelector('#cartAmount');
+		const total = card.querySelector('#cartTotal');
 
-						let amount = parseInt(count.textContent);
-						let current = parseInt(navCart.getAttribute('data-count'));
-						const method = button.getAttribute('data-method');
+		buttons.forEach((button) => {
+			button.addEventListener('click', (event) => {
+				event.preventDefault();
 
-						switch (method) {
-							case 'increase':
-								amount++;
-								count.textContent = amount;
-								navCart.setAttribute('data-count', current + 1);
-								break;
-							case 'decrease':
-								amount--;
-								count.textContent = amount;
-								navCart.setAttribute('data-count', current - 1);
+				const method = button.getAttribute('data-method');
+				if (method == 'increase') {
+					item.amount++;
+					item.totalPrice = item.price * item.amount;
+				}
+				if (method == 'decrease') {
+					item.amount--;
+					item.totalPrice = item.price * item.amount;
+				}
+				if (method == 'delete') {
+					item.amount = 0;
+					item.totalPrice = 0;
+				}
 
-								break;
-							case 'delete':
-								count.textContent = 0;
-								navCart.setAttribute('data-count', current - amount);
-								break;
-							default:
-								throw new Error('Unhandled method');
+				if (item.amount == 0) {
+					card.remove();
+					if (cartContainer.children.length === 0) renderEmptyCart(cartContainer);
+				}
+
+				count.textContent = item.amount;
+				total.textContent = `Total Price: $${(item.price * item.amount).toFixed(0)}`;
+				counter.setAttribute(
+					'data-count',
+					carts.reduce((acc, cart) => acc + cart.amount, 0)
+				);
+				localStorage.setItem('carts', JSON.stringify(carts.filter((cart) => cart.amount > 0)));
+
+				updateFood(id, method)
+					.then((data) => {
+						triggerToast(data.message);
+					})
+					.catch((error) => {
+						if (error instanceof Unauthorized) {
+							localStorage.removeItem('token');
+							localStorage.removeItem('carts');
+
+							triggerToast(error.message);
+							setTimeout(() => {
+								window.location.href = 'login.html';
+							}, 1500);
+						} else {
+							console.error(error);
+							triggerToast(error.message);
+							setTimeout(() => {
+								window.location.reload();
+							}, 1500);
 						}
-
-						if (count.textContent == 0) card.remove();
-						if (cartContainer.children.length === 0) renderEmptyCart(cartContainer);
-
-						updateFood(id, method)
-							.then((data) => {
-								triggerToast(data.message);
-							})
-							.catch((error) => {
-								if (error instanceof Unauthorized) {
-									triggerToast(error.message);
-									setTimeout(() => {
-										window.location.href = 'login.html';
-									}, 1500);
-								} else {
-									console.error(error);
-									triggerToast(error.message);
-									setTimeout(() => {
-										window.location.reload();
-									}, 1500);
-								}
-							});
 					});
-				});
 			});
-		})
-		.catch((error) => {
-			if (error instanceof Unauthorized) {
-				triggerToast(error.message);
-				setTimeout(() => {
-					window.location.href = 'login.html';
-				}, 1500);
-			} else {
-				console.error(error);
-				triggerToast(error.message);
-			}
 		});
+	});
 
 	function triggerToast(message) {
 		const toast = document.getElementById('liveToast');
@@ -162,20 +140,20 @@ function renderCart(carts, container) {
 
 		card.innerHTML = `
 		<div class="row g-0">
-			<div class="col-12 col-xl-4">
+			<a href="food.html?id=${id}" class="card-img-container horizontal col-12 col-xl-4">
 				<img
 					src="${image}"
 					class="card-img-top object-fit-cover h-100"
 					alt="food image" />
-			</div>
+			</a>
 			<div class="col-12 col-xl-8 position-relative">
 				<div class="card-body mb-5">
 					<h6>${name}</h6>
-					<p>$${price}</p>
+					<p id="cartPrice">$${price}</p>
 				</div>
 				<div
 					class="card-footer w-100 position-absolute bottom-0 bg-white d-flex align-items-center justify-content-between">
-					<span>Total Price $${totalPrice}</span>
+					<span id="cartTotal">Total Price $${totalPrice}</span>
 					<div class="d-flex align-items-center justify-content-end">
 						<button class="btn btn-deats square" data-method="increase">+</button>
 						<span class="mx-3" id="cartAmount">

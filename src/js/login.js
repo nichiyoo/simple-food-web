@@ -26,8 +26,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		const loginData = {
-			email: document.getElementById('email').value,
-			password: document.getElementById('password').value,
+			email: form.elements.email.value,
+			password: form.elements.password.value,
 		};
 
 		try {
@@ -44,14 +44,29 @@ document.addEventListener('DOMContentLoaded', function () {
 			const data = await response.json();
 
 			if (response.ok) {
+				const url = new URL('https://food-delivery.kreosoft.ru/api/basket');
+				const headers = new Headers();
+				headers.append('Content-Type', 'application/json');
+				headers.append('Authorization', `Bearer ${data.token}`);
+
+				const response = await fetch(url, {
+					method: 'GET',
+					headers,
+				});
+
+				const carts = await response.json();
 				localStorage.setItem('token', data.token);
+				localStorage.setItem('carts', JSON.stringify(carts));
 				window.location.href = 'menu.html';
 			} else {
-				form.querySelector('#email').classList.add('is-invalid');
-				form.querySelector('#password').classList.add('is-invalid');
+				const email = form.elements.email;
+				const password = form.elements.password;
 
-				form.querySelector('#email').nextElementSibling.innerHTML = 'Please check your email.';
-				form.querySelector('#password').nextElementSibling.innerHTML = 'Please check your password.';
+				email.classList.add('is-invalid');
+				password.classList.add('is-invalid');
+
+				email.nextElementSibling.innerHTML = data.errors.email;
+				password.nextElementSibling.innerHTML = data.errors.password;
 
 				form.classList.add('was-validated');
 				activateButton(button, spinner);
@@ -67,8 +82,10 @@ document.addEventListener('DOMContentLoaded', function () {
 	function triggerToast(message) {
 		const toast = document.getElementById('liveToast');
 		const trigger = bootstrap.Toast.getOrCreateInstance(toast);
+
 		toast.querySelector('.toast-body').innerHTML = message;
 		trigger.show();
+
 		setTimeout(() => {
 			trigger.hide();
 		}, 1500);

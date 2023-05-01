@@ -2,9 +2,12 @@ document.addEventListener('DOMContentLoaded', function () {
 	const bootstrap = window.bootstrap;
 
 	const logoutForm = document.getElementById('logoutForm');
-	const navCart = document.querySelector('a[href="cart.html"]');
-	const navOrders = document.querySelector('a[href="order.html"]');
-	const navProfile = document.querySelector('a[href="profile.html"]');
+
+	// navbar item
+	const navbar = document.getElementById('navbarSupportedContent');
+	const counter = document.querySelector('a[href="cart.html"]');
+	const order = document.querySelector('a[href="orders.html"]');
+	const profile = document.querySelector('a[href="profile.html"]');
 
 	class Unauthorized extends Error {
 		constructor(message) {
@@ -13,17 +16,30 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 	}
 
-	getNavbar()
-		.then((data) => {
-			navProfile.innerHTML = data.email;
-			navCart.setAttribute('data-count', data.carts);
-		})
-		.catch((error) => {
-			[navCart, navOrders, navProfile, logoutForm].forEach((element) => {
-				element.remove();
-			});
-			return;
+	const token = localStorage.getItem('token');
+	const carts = JSON.parse(localStorage.getItem('carts'));
+
+	if (!token) {
+		[counter, order, profile, logoutForm].forEach((element) => {
+			element.remove();
 		});
+
+		const loginButton = document.createElement('a');
+		loginButton.classList.add('btn', 'btn-deats', 'mx-2');
+		loginButton.href = 'login.html';
+		loginButton.textContent = 'Login';
+		navbar.appendChild(loginButton);
+
+		return;
+	}
+
+	counter.setAttribute(
+		'data-count',
+		carts.reduce((acc, cart) => acc + cart.amount, 0)
+	);
+
+	const { email } = parseToken(token);
+	profile.innerHTML = email;
 
 	logoutForm.addEventListener('submit', async (event) => {
 		event.preventDefault();
@@ -31,16 +47,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		const button = event.submitter;
 		const spinner = button.querySelector('span');
 		deactivateButton(button, spinner);
-
-		const token = localStorage.getItem('token');
-		if (!token) {
-			triggerToast('You are not logged in');
-			setTimeout(() => {
-				activateButton(button, spinner);
-				window.location.href = 'login.html';
-			}, 1500);
-			return;
-		}
 
 		try {
 			const url = new URL('https://food-delivery.kreosoft.ru/api/account/logout');
@@ -55,10 +61,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (response.ok) {
 				localStorage.removeItem('token');
+				localStorage.removeItem('carts');
 				window.location.href = 'login.html';
-			} else if (response.status === 401) {
-				throw new Unauthorized('Your session has expired');
 			}
+
+			if (response.status === 401) throw new Unauthorized('Your session has expired');
 		} catch (error) {
 			if (error instanceof Unauthorized) {
 				triggerToast(error.message);
@@ -67,42 +74,11 @@ document.addEventListener('DOMContentLoaded', function () {
 					window.location.href = 'login.html';
 				}, 1500);
 				return;
-			}
-			triggerToast(error.message);
+			} else triggerToast(error.message);
 		}
 
 		activateButton(button, spinner);
 	});
-
-	async function getNavbar() {
-		const token = localStorage.getItem('token');
-		if (!token) throw new Unauthorized('You are not logged in');
-
-		const urls = [
-			'https://food-delivery.kreosoft.ru/api/basket',
-			'https://food-delivery.kreosoft.ru/api/account/profile',
-		];
-
-		const headers = new Headers();
-		headers.append('Content-Type', 'application/json');
-		headers.append('Authorization', `Bearer ${token}`);
-
-		const [dishResponse, profileResponse] = await Promise.all(
-			urls.map((url) => fetch(url, { method: 'GET', headers }))
-		);
-
-		const output = {};
-
-		if (dishResponse.ok && profileResponse.ok) {
-			const [dishData, profileData] = await Promise.all([dishResponse.json(), profileResponse.json()]);
-			output['carts'] = dishData.reduce((acc, dish) => acc + dish.amount, 0);
-			output['email'] = profileData.email;
-		}
-
-		if (dishResponse.status === 401 || profileResponse.status === 401)
-			throw new Unauthorized('Your session has expired');
-		return output;
-	}
 
 	function triggerToast(message) {
 		const toast = document.getElementById('liveToast');
@@ -113,14 +89,29 @@ document.addEventListener('DOMContentLoaded', function () {
 			trigger.hide();
 		}, 1500);
 	}
-
-	function activateButton(button, spinner) {
-		button.disabled = false;
-		spinner.classList.add('d-none');
-	}
-
-	function deactivateButton(button, spinner) {
-		button.disabled = true;
-		spinner.classList.remove('d-none');
-	}
 });
+
+function parseToken(token) {
+	var base64Url = token.split('.')[1];
+	var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+	var jsonPayload = decodeURIComponent(
+		window
+			.atob(base64)
+			.split('')
+			.map(function (c) {
+				return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+			})
+			.join('')
+	);
+	return JSON.parse(jsonPayload);
+}
+
+function activateButton(button, spinner) {
+	button.disabled = false;
+	spinner.classList.add('d-none');
+}
+
+function deactivateButton(button, spinner) {
+	button.disabled = true;
+	spinner.classList.remove('d-none');
+}
