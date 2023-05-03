@@ -28,19 +28,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
 			const originalRating = Math.round(data.rating / 2);
 			const starRatingForm = document.querySelector('.star-rating');
-			const canRate = await checkCanRate(data.id);
 
 			starRatingForm.addEventListener('change', async (event) => {
 				event.preventDefault();
 
-				if (!canRate) {
-					triggerToast('You do not have permission to rate this dish');
-					const radio = starRatingForm.querySelectorAll('.star-input');
-					radio[5 - originalRating].checked = true;
-					return;
-				}
-
 				try {
+					const canRate = await checkCanRate(data.id);
+
+					if (!canRate) {
+						triggerToast('You do not have permission to rate this dish');
+						const radio = starRatingForm.querySelectorAll('.star-input');
+						radio[5 - originalRating].checked = true;
+						return;
+					}
+
 					const token = localStorage.getItem('token');
 
 					const url = new URL(`https://food-delivery.kreosoft.ru/api/dish/${data.id}/rating`);

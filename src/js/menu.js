@@ -64,17 +64,15 @@ document.addEventListener('DOMContentLoaded', function () {
 				cart.totalPrice = cart.price * cart.amount;
 			}
 
-			count.textContent = cart.amount;
-			counter.setAttribute(
-				'data-count',
-				carts.reduce((acc, cart) => acc + cart.amount, 0)
-			);
-
-			localStorage.setItem('carts', JSON.stringify(carts.filter((cart) => cart.amount > 0)));
-			refreshFood({ dishes, pagination });
-
 			updateFood(id, method)
 				.then((data) => {
+					count.textContent = cart.amount;
+					counter.setAttribute(
+						'data-count',
+						carts.reduce((acc, cart) => acc + cart.amount, 0)
+					);
+					localStorage.setItem('carts', JSON.stringify(carts.filter((cart) => cart.amount > 0)));
+					refreshFood({ dishes, pagination });
 					triggerToast(data.message);
 				})
 				.catch((error) => {
@@ -106,15 +104,14 @@ document.addEventListener('DOMContentLoaded', function () {
 				totalPrice: dish.price,
 			});
 
-			counter.setAttribute(
-				'data-count',
-				carts.reduce((acc, item) => acc + item.amount, 0)
-			);
-			localStorage.setItem('carts', JSON.stringify(carts));
-			refreshFood({ dishes, pagination });
-
 			updateFood(dish.id, 'increase')
 				.then((data) => {
+					counter.setAttribute(
+						'data-count',
+						carts.reduce((acc, item) => acc + item.amount, 0)
+					);
+					localStorage.setItem('carts', JSON.stringify(carts));
+					refreshFood({ dishes, pagination });
 					triggerToast(data.message);
 				})
 				.catch((error) => {
@@ -128,11 +125,12 @@ document.addEventListener('DOMContentLoaded', function () {
 						}, 1500);
 					} else {
 						console.error(error.message);
-						triggerToast(error.message);
+						setTimeout(() => {
+							activateButton(button, spinner);
+							triggerToast(error.message);
+						}, 500);
 					}
 				});
-
-			activateButton(button, spinner);
 		}
 	}
 
@@ -241,6 +239,7 @@ async function fetchFood() {
 
 async function updateFood(id, method) {
 	const token = localStorage.getItem('token');
+	if (!token) throw new Error('Please login to continue');
 
 	const url = new URL(`https://food-delivery.kreosoft.ru/api/basket/dish/${id}`);
 	const header = new Headers();
@@ -327,9 +326,9 @@ function renderCard(dishes, container) {
 			const buttonContainer = card.querySelector('#buttonContainer');
 			buttonContainer.innerHTML = `
 			<div class="d-flex align-items-center justify-content-end">
-				<button class="btn btn-deats square" data-method="increase">+</button>
-				<span class="mx-3" id="amount">${cart.amount}</span>
-				<button class="btn btn-deats square" data-method="decrease">-</button>
+			<button class="btn btn-deats square" data-method="decrease">-</button>
+			<span class="mx-3" id="amount">${cart.amount}</span>
+			<button class="btn btn-deats square" data-method="increase">+</button>
 			</div>
 			`;
 		} else {
@@ -340,7 +339,7 @@ function renderCard(dishes, container) {
 						class="spinner-border spinner-border-sm me-2 d-none"
 						role="status"
 						aria-hidden="true"
-						id="orderSpinner">
+						>
 					</span>
 					Add to cart
 				</button>

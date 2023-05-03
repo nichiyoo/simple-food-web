@@ -68,6 +68,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (response.status === 401) throw new Unauthorized('Your session has expired');
 		} catch (error) {
 			if (error instanceof Unauthorized) {
+				localStorage.removeItem('token');
+				localStorage.removeItem('carts');
+
 				triggerToast(error.message);
 				setTimeout(() => {
 					activateButton(button, spinner);

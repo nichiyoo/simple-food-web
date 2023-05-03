@@ -49,8 +49,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		const buttons = card.querySelectorAll('button');
 		const item = carts.find((cart) => cart.id == id);
 
-		const count = card.querySelector('#cartAmount');
-		const total = card.querySelector('#cartTotal');
+		const count = card.querySelector('#amount');
+		const total = card.querySelector('#total');
 
 		buttons.forEach((button) => {
 			button.addEventListener('click', (event) => {
@@ -149,18 +149,16 @@ function renderCart(carts, container) {
 			<div class="col-12 col-xl-8 position-relative">
 				<div class="card-body mb-5">
 					<h6>${name}</h6>
-					<p id="cartPrice">$${price}</p>
+					<p>$${price}</p>
 				</div>
 				<div
 					class="card-footer w-100 position-absolute bottom-0 bg-white d-flex align-items-center justify-content-between">
-					<span id="cartTotal">Total Price $${totalPrice}</span>
+					<span id="total">Total Price $${totalPrice}</span>
 					<div class="d-flex align-items-center justify-content-end">
-						<button class="btn btn-deats square" data-method="increase">+</button>
-						<span class="mx-3" id="cartAmount">
-							${amount}
-						</span>
-						<button class="btn btn-deats square me-3" data-method="decrease">-</button>
-						<button class="btn btn-danger btn-sm" data-method="delete">delete</button>
+					<button class="btn btn-deats square" data-method="decrease">-</button>
+					<span class="mx-3" id="amount">${amount}</span>
+					<button class="btn btn-deats square" data-method="increase">+</button>
+					<button class="btn btn-deats active btn-sm ms-3" data-method="delete">delete</button>
 					</div>
 				</div>
 			</div>
