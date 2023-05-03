@@ -1,4 +1,4 @@
-localStorage.getItem('token') && (window.location.href = 'menu.html');
+localStorage.getItem('token') && (window.location.href = 'index.html');
 
 document.addEventListener('DOMContentLoaded', function () {
 	const bootstrap = window.bootstrap;
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				const carts = await response.json();
 				localStorage.setItem('token', data.token);
 				localStorage.setItem('carts', JSON.stringify(carts));
-				window.location.href = 'menu.html';
+				window.location.href = 'index.html';
 			} else {
 				const email = form.elements.email;
 				const password = form.elements.password;

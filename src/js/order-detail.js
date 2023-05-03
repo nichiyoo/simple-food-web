@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 						triggerToast(error.message);
 						setTimeout(() => {
-							window.location.href = 'menu.html';
+							window.location.href = 'index.html';
 						}, 1500);
 					} else {
 						console.error(error);
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 				triggerToast(error.message);
 				setTimeout(() => {
-					window.location.href = 'menu.html';
+					window.location.href = 'index.html';
 				}, 1500);
 			} else {
 				console.error(error);

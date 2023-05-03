@@ -1,4 +1,4 @@
-localStorage.getItem('token') && (window.location.href = 'menu.html');
+localStorage.getItem('token') && (window.location.href = 'index.html');
 
 document.addEventListener('DOMContentLoaded', function () {
 	const bootstrap = window.bootstrap;
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (response.ok) {
 				localStorage.setItem('token', data.token);
 				localStorage.setItem('carts', []);
-				window.location.href = 'menu.html';
+				window.location.href = 'index.html';
 			} else {
 				if (Object.keys(data).includes('DuplicateUserName')) {
 					const email = form.elements.email;

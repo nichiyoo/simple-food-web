@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			console.error(error);
 			triggerToast(error.message);
 			setTimeout(() => {
-				window.location.href = 'menu.html';
+				window.location.href = 'index.html';
 			}, 1500);
 		});
 
